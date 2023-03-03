@@ -9,11 +9,10 @@ require 'sinatra/activerecord'
 set :database, {adapter: "sqlite3", database: "pizzashop.db"}
 
 class Product < ActiveRecord::Base
-
-
-
 end
 
+class Order < ActiveRecord::Base
+end
 
 
 get '/' do
@@ -26,9 +25,14 @@ get '/about' do
 end
 
 post '/cart' do
-	orders_input = params[:orders]
-	@orders = parse_orders_input orders_input
-	erb "Hello! #{@orders.inspect}"
+	@orders_input = params[:orders]
+	@items = parse_orders_input @orders_input
+	@items.each do |item|
+		item[0] = Product.find(item[0])
+
+	end
+
+	erb :cart
 end
 
 def parse_orders_input orders_input
@@ -47,3 +51,14 @@ def parse_orders_input orders_input
 	return arr
 end
 
+
+#post '/place_order' do
+# @shipment = Shipment.new params[:order]
+
+#  if @shipment.save
+#    erb :order_placed
+#  else
+#    @error = @shipment.errors.full_messages.first
+#    erb "Error"
+#  end
+#end
